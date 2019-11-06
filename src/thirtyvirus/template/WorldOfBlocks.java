@@ -17,21 +17,27 @@ import thirtyvirus.template.helpers.Utilities;
 import java.io.File;
 import java.util.*;
 
-public class TemplatePlugin extends JavaPlugin {
+public class WorldOfBlocks extends JavaPlugin {
 
     // console and IO
     private File langFile;
     private FileConfiguration langFileConfig;
 
     // chat messages
-    private Map<String, String> phrases = new HashMap<String, String>();
+    private Map<String, String> phrases = new HashMap<>();
 
     // core settings
-    public static String prefix = "&c&l[&5&lTemplatePlugin&c&l] &8&l"; // generally unchanged unless otherwise stated in config
-    public static String consolePrefix = "[TemplatePlugin] ";
+    public static String prefix = "&c&l[&5&lWorldOfBlocks&c&l] &8&l"; // generally unchanged unless otherwise stated in config
+    public static String consolePrefix = "[WorldOfBlocks] ";
 
     // customizable settings
     public static boolean customSetting = false;
+    public static boolean enabled = false;
+
+    public static int minRadius = 1;
+    public static int maxRadius = 12;
+    public static int tickDelay = 60;
+    public static int blocksPerAction = 10;
 
     public void onEnable(){
         // load config.yml (generate one if not there)
@@ -47,15 +53,12 @@ public class TemplatePlugin extends JavaPlugin {
         // posts confirmation in chat
         getLogger().info(getDescription().getName() + " V: " + getDescription().getVersion() + " has been enabled");
 
-        // example scheduled task
-        //if (autoPurge){
-        //    Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-        //        public void run() {
-        //            if (debug) Bukkit.getLogger().info("Automatically Purged " + Utilities.purge(shops, consolePrefix, debug, purgeAge) + " empty shops that haven't been active in the past " + purgeAge + " hour(s).");
-        //            if (!debug) Utilities.purge(shops, consolePrefix, debug, purgeAge);
-        //        }
-        //    }, 20 * 60 * 60, 20 * 60 * 60);
-        //}
+        // scheduled task
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            public void run() {
+                if (enabled) Utilities.replaceBlocks();
+            }
+        }, tickDelay,tickDelay);
     }
 
     public void onDisable(){
@@ -64,10 +67,10 @@ public class TemplatePlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        getCommand("template").setExecutor(new MainPluginCommand(this));
+        getCommand("wob").setExecutor(new MainPluginCommand(this));
 
         // set up tab completion
-        getCommand("template").setTabCompleter(new TabComplete(this));
+        getCommand("wob").setTabCompleter(new TabComplete(this));
     }
     private void registerEvents() {
         getServer().getPluginManager().registerEvents(new BlockClick(this), this);
@@ -86,8 +89,10 @@ public class TemplatePlugin extends JavaPlugin {
         // general settings
         prefix = ChatColor.translateAlternateColorCodes('&', config.getString("plugin-prefix"));
 
-        customSetting = config.getBoolean("custom-setting");
-        // put more settings here
+        minRadius = config.getInt("minimum-radius");
+        maxRadius = config.getInt("maximum-radius");
+        tickDelay = config.getInt("tick-delay");
+        blocksPerAction = config.getInt("blacks-per-action");
 
         Bukkit.getLogger().info(consolePrefix + "Settings Reloaded from config");
     }

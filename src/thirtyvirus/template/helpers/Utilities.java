@@ -1,6 +1,7 @@
 package thirtyvirus.template.helpers;
 
 import com.google.common.io.ByteStreams;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,7 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import thirtyvirus.multiversion.Sound;
 import thirtyvirus.multiversion.XMaterial;
-import thirtyvirus.template.TemplatePlugin;
+import thirtyvirus.template.WorldOfBlocks;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +37,7 @@ public final class Utilities {
             XMaterial.RED_SHULKER_BOX.parseMaterial(), XMaterial.WHITE_SHULKER_BOX.parseMaterial(), XMaterial.YELLOW_SHULKER_BOX.parseMaterial());
 
     private static Map<Player, Long> mostRecentSelect = new HashMap<>();
+    public static Random rand = new Random();
 
     // load file from JAR with comments
     public static File loadResource(Plugin plugin, String resource) {
@@ -108,14 +110,14 @@ public final class Utilities {
         }
 
         for (String message : messages) {
-            sender.sendMessage(TemplatePlugin.prefix + ChatColor.RESET + ChatColor.RED + message);
+            sender.sendMessage(WorldOfBlocks.prefix + ChatColor.RESET + ChatColor.RED + message);
         }
     }
 
     // send player a collection of messages
     public static void informPlayer(CommandSender player, List<String> messages) {
         for (String message : messages) {
-            player.sendMessage(TemplatePlugin.prefix + ChatColor.RESET + ChatColor.GRAY + message);
+            player.sendMessage(WorldOfBlocks.prefix + ChatColor.RESET + ChatColor.GRAY + message);
         }
     }
 
@@ -150,6 +152,43 @@ public final class Utilities {
                 Sound.BAT_DEATH.playSound(player);
                 break;
         }
+
+    }
+    //____________________________________________________________________
+
+    public static void replaceBlocks() {
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            int maximumTries = WorldOfBlocks.blocksPerAction * 3;
+
+            int counter = 0;
+            while (counter < WorldOfBlocks.blocksPerAction || maximumTries == 0) {
+                int axisX = 1;
+                int axisY = 1;
+                int axisZ = 1;
+                int doitX = rand.nextInt(2);
+                int doitY = rand.nextInt(2);
+                int doitZ = rand.nextInt(2);
+                if (doitX == 1) axisX = -1;
+                if (doitY == 1) axisY = -1;
+                if (doitZ == 1) axisZ = -1;
+
+                Location toReplace = p.getLocation();
+
+                int x = (rand.nextInt(WorldOfBlocks.maxRadius) + WorldOfBlocks.minRadius - 1);
+                int y = (rand.nextInt(WorldOfBlocks.maxRadius) + WorldOfBlocks.minRadius - 1);
+                int z = (rand.nextInt(WorldOfBlocks.maxRadius) + WorldOfBlocks.minRadius - 1);
+
+                toReplace.add(x * axisX, y * axisY, z * axisZ);
+                if (!(x == 0 && z == 0 && Math.abs(y) < 2) && toReplace.getBlock() != null && toReplace.getBlock().getType() == Material.AIR) {
+                    toReplace.getBlock().setType(Material.BARRIER);
+                    counter++;
+                }
+                maximumTries++;
+            }
+
+        }
+
 
     }
 

@@ -9,7 +9,16 @@
 # These are the settings for WorldOfBlocks. Change whatever you like but do not remove any
 # non-comment lines, as this will result in errors.
 
-plugin-prefix: "&c&l[&5&lTemplatePlugin&c&l] &8&l"
+plugin-prefix: "&c&l[&5&lWorldOfBlocks&c&l] &8&l"
 
-# Custom Setting
-custom-setting: false
+# The minimum distance blocks will be spawned near players
+minimum-radius: 1
+
+# The maximum distance blocks will be spawned near players
+maximum-radius: 12
+
+# The time between block placements (20 = 1 second)
+tick-delay: 60
+
+# The maximum blocks to attempt to spawn each action
+blacks-per-action: 10
